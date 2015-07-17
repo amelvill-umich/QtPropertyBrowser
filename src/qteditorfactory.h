@@ -43,6 +43,7 @@
 
 #include "qtpropertymanager.h"
 
+
 #if QT_VERSION >= 0x040400
 QT_BEGIN_NAMESPACE
 #endif
@@ -67,6 +68,8 @@ private:
     Q_PRIVATE_SLOT(d_func(), void slotPropertyChanged(QtProperty *, int))
     Q_PRIVATE_SLOT(d_func(), void slotRangeChanged(QtProperty *, int, int))
     Q_PRIVATE_SLOT(d_func(), void slotSingleStepChanged(QtProperty *, int))
+    Q_PRIVATE_SLOT(d_func(), void slotPrefixChanged(QtProperty *, QString))
+    Q_PRIVATE_SLOT(d_func(), void slotSuffixChanged(QtProperty *, QString))
     Q_PRIVATE_SLOT(d_func(), void slotSetValue(int))
     Q_PRIVATE_SLOT(d_func(), void slotEditorDestroyed(QObject *))
 };
@@ -161,6 +164,8 @@ private:
     Q_PRIVATE_SLOT(d_func(), void slotPropertyChanged(QtProperty *, double))
     Q_PRIVATE_SLOT(d_func(), void slotRangeChanged(QtProperty *, double, double))
     Q_PRIVATE_SLOT(d_func(), void slotSingleStepChanged(QtProperty *, double))
+    Q_PRIVATE_SLOT(d_func(), void slotPrefixChanged(QtProperty *, QString))
+    Q_PRIVATE_SLOT(d_func(), void slotSuffixChanged(QtProperty *, QString))
     Q_PRIVATE_SLOT(d_func(), void slotDecimalsChanged(QtProperty *, int))
     Q_PRIVATE_SLOT(d_func(), void slotSetValue(double))
     Q_PRIVATE_SLOT(d_func(), void slotEditorDestroyed(QObject *))
@@ -392,6 +397,30 @@ private:
     Q_PRIVATE_SLOT(d_func(), void slotEditorDestroyed(QObject *))
     Q_PRIVATE_SLOT(d_func(), void slotSetValue(const QFont &))
 };
+
+class QtUrlEditorFactoryPrivate;
+
+class QT_QTPROPERTYBROWSER_EXPORT QtUrlEditorFactory : public QtAbstractEditorFactory < QtUrlPropertyManager >
+{
+    Q_OBJECT
+public:
+    QtUrlEditorFactory(QObject *parent = 0);
+    ~QtUrlEditorFactory();
+protected:
+    void connectPropertyManager(QtUrlPropertyManager *manager);
+    QWidget *createEditor(QtUrlPropertyManager *manager, QtProperty *property,
+        QWidget *parent);
+    void disconnectPropertyManager(QtUrlPropertyManager *manager);
+private:
+    QtUrlEditorFactoryPrivate *d_ptr;
+    Q_DECLARE_PRIVATE(QtUrlEditorFactory)
+    Q_DISABLE_COPY(QtUrlEditorFactory)
+    Q_PRIVATE_SLOT(d_func(), void slotPropertyChanged(QtProperty *, const QUrl &))
+    Q_PRIVATE_SLOT(d_func(), void slotEditorDestroyed(QObject *))
+    Q_PRIVATE_SLOT(d_func(), void slotSetValue(const QString &))
+};
+
+
 
 #if QT_VERSION >= 0x040400
 QT_END_NAMESPACE

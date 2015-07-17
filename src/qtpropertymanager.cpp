@@ -40,19 +40,20 @@
 
 #include "qtpropertymanager.h"
 #include "qtpropertybrowserutils_p.h"
-#include <QtCore/QDateTime>
-#include <QtCore/QLocale>
-#include <QtCore/QMap>
-#include <QtCore/QTimer>
-#include <QtGui/QIcon>
-#include <QtCore/QMetaEnum>
-#include <QtGui/QFontDatabase>
-#include <QtGui/QStyleOption>
-#include <QtGui/QStyle>
-#include <QtGui/QApplication>
-#include <QtGui/QPainter>
-#include <QtGui/QLabel>
-#include <QtGui/QCheckBox>
+#include <QDateTime>
+#include <QLocale>
+#include <QMap>
+#include <QTimer>
+#include <QIcon>
+#include <QMetaEnum>
+#include <QFontDatabase>
+#include <QStyleOption>
+#include <QStyle>
+#include <QApplication>
+#include <QPainter>
+#include <QLabel>
+#include <QCheckBox>
+#include <QUrl>
 
 #include <limits.h>
 #include <float.h>
@@ -192,8 +193,7 @@ static Value getData(const QMap<const QtProperty *, PrivateData> &propertyMap,
             const QtProperty *property, const Value &defaultValue = Value())
 {
     typedef QMap<const QtProperty *, PrivateData> PropertyToData;
-    typedef Q_TYPENAME PropertyToData::const_iterator PropertyToDataConstIterator;
-    const PropertyToDataConstIterator it = propertyMap.constFind(property);
+    auto it = propertyMap.constFind(property);
     if (it == propertyMap.constEnd())
         return defaultValue;
     return it.value().*data;
@@ -228,7 +228,7 @@ static void setSimpleValue(QMap<const QtProperty *, Value> &propertyMap,
             QtProperty *property, const Value &val)
 {
     typedef QMap<const QtProperty *, Value> PropertyToData;
-    typedef Q_TYPENAME PropertyToData::iterator PropertyToDataIterator;
+    typedef typename PropertyToData::iterator PropertyToDataIterator;
     const PropertyToDataIterator it = propertyMap.find(property);
     if (it == propertyMap.end())
         return;
@@ -249,9 +249,9 @@ static void setValueInRange(PropertyManager *manager, PropertyManagerPrivate *ma
             QtProperty *property, const Value &val,
             void (PropertyManagerPrivate::*setSubPropertyValue)(QtProperty *, ValueChangeParameter))
 {
-    typedef Q_TYPENAME PropertyManagerPrivate::Data PrivateData;
+    typedef typename PropertyManagerPrivate::Data PrivateData;
     typedef QMap<const QtProperty *, PrivateData> PropertyToData;
-    typedef Q_TYPENAME PropertyToData::iterator PropertyToDataIterator;
+    typedef typename PropertyToData::iterator PropertyToDataIterator;
     const PropertyToDataIterator it = managerPrivate->m_values.find(property);
     if (it == managerPrivate->m_values.end())
         return;
@@ -284,9 +284,9 @@ static void setBorderValues(PropertyManager *manager, PropertyManagerPrivate *ma
             void (PropertyManagerPrivate::*setSubPropertyRange)(QtProperty *,
                     ValueChangeParameter, ValueChangeParameter, ValueChangeParameter))
 {
-    typedef Q_TYPENAME PropertyManagerPrivate::Data PrivateData;
+    typedef typename PropertyManagerPrivate::Data PrivateData;
     typedef QMap<const QtProperty *, PrivateData> PropertyToData;
-    typedef Q_TYPENAME PropertyToData::iterator PropertyToDataIterator;
+    typedef typename PropertyToData::iterator PropertyToDataIterator;
     const PropertyToDataIterator it = managerPrivate->m_values.find(property);
     if (it == managerPrivate->m_values.end())
         return;
@@ -329,7 +329,7 @@ static void setBorderValue(PropertyManager *manager, PropertyManagerPrivate *man
                     ValueChangeParameter, ValueChangeParameter, ValueChangeParameter))
 {
     typedef QMap<const QtProperty *, PrivateData> PropertyToData;
-    typedef Q_TYPENAME PropertyToData::iterator PropertyToDataIterator;
+    typedef typename PropertyToData::iterator PropertyToDataIterator;
     const PropertyToDataIterator it = managerPrivate->m_values.find(property);
     if (it == managerPrivate->m_values.end())
         return;
@@ -628,6 +628,8 @@ public:
         int minVal;
         int maxVal;
         int singleStep;
+        QString prefix;
+        QString suffix;
         int minimumValue() const { return minVal; }
         int maximumValue() const { return maxVal; }
         void setMinimumValue(int newMinVal) { setSimpleMinimumData(this, newMinVal); }
@@ -754,6 +756,16 @@ int QtIntPropertyManager::singleStep(const QtProperty *property) const
     return getData<int>(d_ptr->m_values, &QtIntPropertyManagerPrivate::Data::singleStep, property, 0);
 }
 
+QString QtIntPropertyManager::prefix(const QtProperty *property) const
+{
+    return getData<QString>(d_ptr->m_values, &QtIntPropertyManagerPrivate::Data::prefix, property, 0);
+}
+
+QString QtIntPropertyManager::suffix(const QtProperty *property) const
+{
+    return getData<QString>(d_ptr->m_values, &QtIntPropertyManagerPrivate::Data::suffix, property, 0);
+}
+
 /*!
     \reimp
 */
@@ -762,7 +774,7 @@ QString QtIntPropertyManager::valueText(const QtProperty *property) const
     const QtIntPropertyManagerPrivate::PropertyValueMap::const_iterator it = d_ptr->m_values.constFind(property);
     if (it == d_ptr->m_values.constEnd())
         return QString();
-    return QString::number(it.value().val);
+    return it.value().prefix + QString::number(it.value().val) + it.value().suffix;
 }
 
 /*!
@@ -873,6 +885,44 @@ void QtIntPropertyManager::setSingleStep(QtProperty *property, int step)
     emit singleStepChanged(property, data.singleStep);
 }
 
+void QtIntPropertyManager::setPrefix(QtProperty *property, QString prefix)
+{
+    const QtIntPropertyManagerPrivate::PropertyValueMap::iterator it = d_ptr->m_values.find(property);
+    if (it == d_ptr->m_values.end())
+        return;
+
+    QtIntPropertyManagerPrivate::Data data = it.value();
+
+    if (data.prefix == prefix)
+        return;
+
+    data.prefix = prefix;
+
+    it.value() = data;
+
+    emit prefixChanged(property, data.prefix);
+}
+
+void QtIntPropertyManager::setSuffix(QtProperty *property, QString suffix)
+{
+    const QtIntPropertyManagerPrivate::PropertyValueMap::iterator it = d_ptr->m_values.find(property);
+    if (it == d_ptr->m_values.end())
+        return;
+
+    QtIntPropertyManagerPrivate::Data data = it.value();
+
+    if (data.suffix == suffix)
+        return;
+
+    data.suffix = suffix;
+
+    it.value() = data;
+
+    emit suffixChanged(property, data.suffix);
+}
+
+
+
 /*!
     \reimp
 */
@@ -905,6 +955,8 @@ public:
         double maxVal;
         double singleStep;
         int decimals;
+        QString prefix;
+        QString suffix;
         double minimumValue() const { return minVal; }
         double maximumValue() const { return maxVal; }
         void setMinimumValue(double newMinVal) { setSimpleMinimumData(this, newMinVal); }
@@ -1042,6 +1094,18 @@ double QtDoublePropertyManager::singleStep(const QtProperty *property) const
     return getData<double>(d_ptr->m_values, &QtDoublePropertyManagerPrivate::Data::singleStep, property, 0);
 }
 
+QString QtDoublePropertyManager::prefix(const QtProperty *property) const
+{
+    return getData<QString>(d_ptr->m_values, &QtDoublePropertyManagerPrivate::Data::prefix, property, 0);
+}
+
+QString QtDoublePropertyManager::suffix(const QtProperty *property) const
+{
+    return getData<QString>(d_ptr->m_values, &QtDoublePropertyManagerPrivate::Data::suffix, property, 0);
+}
+
+
+
 /*!
     Returns the given \a property's precision, in decimals.
 
@@ -1060,7 +1124,7 @@ QString QtDoublePropertyManager::valueText(const QtProperty *property) const
     const QtDoublePropertyManagerPrivate::PropertyValueMap::const_iterator it = d_ptr->m_values.constFind(property);
     if (it == d_ptr->m_values.constEnd())
         return QString();
-    return QString::number(it.value().val, 'f', it.value().decimals);
+    return it.value().prefix + QString::number(it.value().val, 'g', it.value().decimals) + it.value().suffix;
 }
 
 /*!
@@ -1110,6 +1174,44 @@ void QtDoublePropertyManager::setSingleStep(QtProperty *property, double step)
 
     emit singleStepChanged(property, data.singleStep);
 }
+
+void QtDoublePropertyManager::setPrefix(QtProperty *property, QString prefix)
+{
+    const QtDoublePropertyManagerPrivate::PropertyValueMap::iterator it = d_ptr->m_values.find(property);
+    if (it == d_ptr->m_values.end())
+        return;
+
+    QtDoublePropertyManagerPrivate::Data data = it.value();
+
+    if (data.prefix == prefix)
+        return;
+
+    data.prefix = prefix;
+
+    it.value() = data;
+
+    emit prefixChanged(property, data.prefix);
+}
+
+void QtDoublePropertyManager::setSuffix(QtProperty *property, QString suffix)
+{
+    const QtDoublePropertyManagerPrivate::PropertyValueMap::iterator it = d_ptr->m_values.find(property);
+    if (it == d_ptr->m_values.end())
+        return;
+
+    QtDoublePropertyManagerPrivate::Data data = it.value();
+
+    if (data.suffix == suffix)
+        return;
+
+    data.suffix = suffix;
+
+    it.value() = data;
+
+    emit suffixChanged(property, data.suffix);
+}
+
+
 
 /*!
     \fn void QtDoublePropertyManager::setDecimals(QtProperty *property, int prec)
@@ -6413,6 +6515,154 @@ void QtCursorPropertyManager::initializeProperty(QtProperty *property)
     \reimp
 */
 void QtCursorPropertyManager::uninitializeProperty(QtProperty *property)
+{
+    d_ptr->m_values.remove(property);
+}
+
+// QtUrlPropertyManager
+
+class QtUrlPropertyManagerPrivate
+{
+    QtUrlPropertyManager *q_ptr;
+    Q_DECLARE_PUBLIC(QtUrlPropertyManager)
+public:
+
+    struct Data
+    {
+        QUrl val;
+    };
+
+    typedef QMap<const QtProperty *, Data> PropertyValueMap;
+    QMap<const QtProperty *, Data> m_values;
+};
+
+/*!
+\class QtUrlPropertyManager
+
+\brief The QtUrlPropertyManager provides and manages QDate properties.
+
+A date property has a current value, and a range specifying the
+valid dates. The range is defined by a minimum and a maximum
+value.
+
+The property's values can be retrieved using the minimum(),
+maximum() and value() functions, and can be set using the
+setMinimum(), setMaximum() and setValue() slots. Alternatively,
+the range can be defined in one go using the setRange() slot.
+
+In addition, QtUrlPropertyManager provides the valueChanged() signal
+which is emitted whenever a property created by this manager
+changes, and the rangeChanged() signal which is emitted whenever
+such a property changes its range of valid dates.
+
+\sa QtAbstractPropertyManager, QtDateEditFactory, QtDateTimePropertyManager
+*/
+
+/*!
+\fn void QtUrlPropertyManager::valueChanged(QtProperty *property, const QDate &value)
+
+This signal is emitted whenever a property created by this manager
+changes its value, passing a pointer to the \a property and the new
+\a value as parameters.
+
+\sa setValue()
+*/
+
+/*!
+\fn void QtUrlPropertyManager::rangeChanged(QtProperty *property, const QDate &minimum, const QDate &maximum)
+
+This signal is emitted whenever a property created by this manager
+changes its range of valid dates, passing a pointer to the \a
+property and the new \a minimum and \a maximum dates.
+
+\sa setRange()
+*/
+
+/*!
+Creates a manager with the given \a parent.
+*/
+QtUrlPropertyManager::QtUrlPropertyManager(QObject *parent)
+    : QtAbstractPropertyManager(parent)
+{
+    d_ptr = new QtUrlPropertyManagerPrivate;
+    d_ptr->q_ptr = this;
+}
+
+/*!
+Destroys this manager, and all the properties it has created.
+*/
+QtUrlPropertyManager::~QtUrlPropertyManager()
+{
+    clear();
+    delete d_ptr;
+}
+
+/*!
+Returns the given \a property's value.
+
+If the given \a property is not managed by \e this manager, this
+function returns an invalid date.
+
+\sa setValue()
+*/
+QUrl QtUrlPropertyManager::value(const QtProperty *property) const
+{
+    return getValue<QUrl>(d_ptr->m_values, property);
+}
+
+/*!
+\reimp
+*/
+QString QtUrlPropertyManager::valueText(const QtProperty *property) const
+{
+    const QtUrlPropertyManagerPrivate::PropertyValueMap::const_iterator it = d_ptr->m_values.constFind(property);
+    if (it == d_ptr->m_values.constEnd())
+        return QString();
+    return it.value().val.toLocalFile();
+}
+
+/*!
+\fn void QtUrlPropertyManager::setValue(QtProperty *property, const QDate &value)
+
+Sets the value of the given \a property to \a value.
+
+If the specified \a value is not a valid date according to the
+given \a property's range, the value is adjusted to the nearest
+valid value within the range.
+
+\sa value(), setRange(), valueChanged()
+*/
+void QtUrlPropertyManager::setValue(QtProperty *property, const QUrl &val)
+{
+    const QtUrlPropertyManagerPrivate::PropertyValueMap::iterator it = d_ptr->m_values.find(property);
+    if (it == d_ptr->m_values.end())
+        return;
+
+    QtUrlPropertyManagerPrivate::Data data = it.value();
+
+//     if (data.val == val)
+//         return;
+
+    data.val = val;
+
+    it.value() = data;
+
+    emit propertyChanged(property);
+    emit valueChanged(property, data.val);
+}
+
+/*!
+\reimp
+*/
+void QtUrlPropertyManager::initializeProperty(QtProperty *property)
+{
+    d_ptr->m_values[property] = QtUrlPropertyManagerPrivate::Data();
+}
+
+/*!
+\reimp
+*/
+void QtUrlPropertyManager::uninitializeProperty(QtProperty *property)
 {
     d_ptr->m_values.remove(property);
 }

@@ -123,6 +123,8 @@ private:
     Q_PRIVATE_SLOT(d_func(), void slotValueChanged(QtProperty *, int))
     Q_PRIVATE_SLOT(d_func(), void slotRangeChanged(QtProperty *, int, int))
     Q_PRIVATE_SLOT(d_func(), void slotSingleStepChanged(QtProperty *, int))
+    Q_PRIVATE_SLOT(d_func(), void slotPrefixChanged(QtProperty *, QString))
+    Q_PRIVATE_SLOT(d_func(), void slotSuffixChanged(QtProperty *, QString))
     Q_PRIVATE_SLOT(d_func(), void slotValueChanged(QtProperty *, double))
     Q_PRIVATE_SLOT(d_func(), void slotRangeChanged(QtProperty *, double, double))
     Q_PRIVATE_SLOT(d_func(), void slotSingleStepChanged(QtProperty *, double))
@@ -154,6 +156,7 @@ private:
     Q_PRIVATE_SLOT(d_func(), void slotValueChanged(QtProperty *, const QFont &))
     Q_PRIVATE_SLOT(d_func(), void slotValueChanged(QtProperty *, const QCursor &))
     Q_PRIVATE_SLOT(d_func(), void slotFlagNamesChanged(QtProperty *, const QStringList &))
+    Q_PRIVATE_SLOT(d_func(), void slotValueChanged(QtProperty *, const QUrl &))
 
     Q_PRIVATE_SLOT(d_func(), void slotPropertyInserted(QtProperty *, QtProperty *, QtProperty *))
     Q_PRIVATE_SLOT(d_func(), void slotPropertyRemoved(QtProperty *, QtProperty *))

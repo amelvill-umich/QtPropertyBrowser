@@ -51,6 +51,7 @@ class QDate;
 class QTime;
 class QDateTime;
 class QLocale;
+class QUrl;
 
 class QT_QTPROPERTYBROWSER_EXPORT QtGroupPropertyManager : public QtAbstractPropertyManager
 {
@@ -79,6 +80,8 @@ public:
     int minimum(const QtProperty *property) const;
     int maximum(const QtProperty *property) const;
     int singleStep(const QtProperty *property) const;
+    QString prefix(const QtProperty *property) const;
+    QString suffix(const QtProperty *property) const;
 
 public Q_SLOTS:
     void setValue(QtProperty *property, int val);
@@ -86,10 +89,14 @@ public Q_SLOTS:
     void setMaximum(QtProperty *property, int maxVal);
     void setRange(QtProperty *property, int minVal, int maxVal);
     void setSingleStep(QtProperty *property, int step);
+    void setPrefix(QtProperty *property, QString prefix);
+    void setSuffix(QtProperty *property, QString suffix);
 Q_SIGNALS:
     void valueChanged(QtProperty *property, int val);
     void rangeChanged(QtProperty *property, int minVal, int maxVal);
     void singleStepChanged(QtProperty *property, int step);
+    void prefixChanged(QtProperty *property, QString prefix);
+    void suffixChanged(QtProperty *property, QString suffix);
 protected:
     QString valueText(const QtProperty *property) const;
     virtual void initializeProperty(QtProperty *property);
@@ -140,6 +147,8 @@ public:
     double maximum(const QtProperty *property) const;
     double singleStep(const QtProperty *property) const;
     int decimals(const QtProperty *property) const;
+    QString prefix(const QtProperty *property) const;
+    QString suffix(const QtProperty *property) const;
 
 public Q_SLOTS:
     void setValue(QtProperty *property, double val);
@@ -148,11 +157,15 @@ public Q_SLOTS:
     void setRange(QtProperty *property, double minVal, double maxVal);
     void setSingleStep(QtProperty *property, double step);
     void setDecimals(QtProperty *property, int prec);
+    void setPrefix(QtProperty *property, QString prefix);
+    void setSuffix(QtProperty *property, QString suffix);
 Q_SIGNALS:
     void valueChanged(QtProperty *property, double val);
     void rangeChanged(QtProperty *property, double minVal, double maxVal);
     void singleStepChanged(QtProperty *property, double step);
     void decimalsChanged(QtProperty *property, int prec);
+    void prefixChanged(QtProperty *property, QString prefix);
+    void suffixChanged(QtProperty *property, QString suffix);
 protected:
     QString valueText(const QtProperty *property) const;
     virtual void initializeProperty(QtProperty *property);
@@ -741,6 +754,33 @@ private:
     Q_DECLARE_PRIVATE(QtCursorPropertyManager)
     Q_DISABLE_COPY(QtCursorPropertyManager)
 };
+
+
+class QtUrlPropertyManagerPrivate;
+
+class QT_QTPROPERTYBROWSER_EXPORT QtUrlPropertyManager : public QtAbstractPropertyManager
+{
+    Q_OBJECT
+public:
+    QtUrlPropertyManager(QObject *parent = 0);
+    ~QtUrlPropertyManager();
+
+    QUrl value(const QtProperty *property) const;
+
+public Q_SLOTS:
+    void setValue(QtProperty *property, const QUrl &val);
+Q_SIGNALS:
+    void valueChanged(QtProperty *property, const QUrl &val);
+protected:
+    QString valueText(const QtProperty *property) const;
+    virtual void initializeProperty(QtProperty *property);
+    virtual void uninitializeProperty(QtProperty *property);
+private:
+    QtUrlPropertyManagerPrivate *d_ptr;
+    Q_DECLARE_PRIVATE(QtUrlPropertyManager)
+    Q_DISABLE_COPY(QtUrlPropertyManager)
+};
+
 
 #if QT_VERSION >= 0x040400
 QT_END_NAMESPACE

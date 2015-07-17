@@ -52,10 +52,11 @@
 #ifndef QTPROPERTYBROWSERUTILS_H
 #define QTPROPERTYBROWSERUTILS_H
 
-#include <QtCore/QMap>
-#include <QtGui/QIcon>
-#include <QtGui/QWidget>
-#include <QtCore/QStringList>
+#include <QMap>
+#include <QIcon>
+#include <QWidget>
+#include <QStringList>
+#include <QToolButton>
 
 #if QT_VERSION >= 0x040400
 QT_BEGIN_NAMESPACE
@@ -154,6 +155,26 @@ private:
     QKeySequence m_keySequence;
     QLineEdit *m_lineEdit;
 };
+
+class QtFileNameEdit : public QWidget {
+    Q_OBJECT
+public:
+    QtFileNameEdit(QWidget *parent = 0);
+
+    QString fileName() const;
+    void setFileName(QString fileName, bool forceEmitChangedSignal = false);
+
+Q_SIGNALS:
+    void fileNameChanged(QString fileName);
+
+private Q_SLOTS:
+    void openFile();
+
+private:
+    QLineEdit *m_fileNameEdit;
+    QToolButton *m_openFileButton;
+};
+
 
 #if QT_VERSION >= 0x040400
 QT_END_NAMESPACE

@@ -15,11 +15,15 @@ FOREACH(type LIBRARY RUNTIME ARCHIVE)
   ENDIF()
 ENDFOREACH()
 
+# Find includes in corresponding build directories
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+# Instruct CMake to run moc automatically when needed.
+set(CMAKE_AUTOMOC ON)
+
 #-----------------------------------------------------------------------------
 # Qt
 #
-FIND_PACKAGE(Qt4 4.7 REQUIRED)
-INCLUDE(${QT_USE_FILE})
+FIND_PACKAGE(Qt5 COMPONENTS Widgets REQUIRED)
 
 #-----------------------------------------------------------------------------
 # Subdirectories
