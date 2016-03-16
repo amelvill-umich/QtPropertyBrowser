@@ -1951,16 +1951,18 @@ void QtVariantPropertyManager::uninitializeProperty(QtProperty *property)
     if (type_it == d_ptr->m_propertyToType.end())
         return;
 
-    PropertyMap::iterator it = propertyToWrappedProperty()->find(property);
-    if (it != propertyToWrappedProperty()->end()) {
-        QtProperty *internProp = it.value();
-        if (internProp) {
-            d_ptr->m_internalToProperty.remove(internProp);
-            if (!d_ptr->m_destroyingSubProperties) {
-                delete internProp;
+    if (propertyToWrappedProperty()) {
+        PropertyMap::iterator it = propertyToWrappedProperty()->find(property);
+        if (it != propertyToWrappedProperty()->end()) {
+            QtProperty *internProp = it.value();
+            if (internProp) {
+                d_ptr->m_internalToProperty.remove(internProp);
+                if (!d_ptr->m_destroyingSubProperties) {
+                    delete internProp;
+                }
             }
+            propertyToWrappedProperty()->erase(it);
         }
-        propertyToWrappedProperty()->erase(it);
     }
     d_ptr->m_propertyToType.erase(type_it);
 }
