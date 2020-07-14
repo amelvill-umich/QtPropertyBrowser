@@ -52,6 +52,7 @@ int main(int argc, char **argv)
 
     int i = 0;
     QtProperty *topItem = variantManager->addProperty(QtVariantPropertyManager::groupTypeId(),
+                // UB? Isn't this as bad as i++ + 2?
                 QString::number(i++) + QLatin1String(" Group Property"));
 
     QtVariantProperty *item = variantManager->addProperty(QVariant::Bool, QString::number(i++) + QLatin1String(" Bool Property"));
