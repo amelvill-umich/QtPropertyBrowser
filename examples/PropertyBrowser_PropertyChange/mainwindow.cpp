@@ -6,6 +6,7 @@
 #include <qttreepropertybrowser.h>
 #include <QWidget>
 #include <QLayout>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -50,7 +51,20 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::OnValueChanged_Print(QtProperty* prop, const QVariant& val)
 {
-    qDebug("Class Scope: Got a value changed event");
+    QString propertyString = "NULL";
+    QString valueString = "NULL";
+
+    if(prop != nullptr)
+    {
+        propertyString = prop->propertyName();
+    }
+
+
+    valueString =  val.toString();
+
+    QString messageString = QString("Class Scope: Got a value changed event. Property '%1' changed to value '%2'.").arg(propertyString).arg(valueString);
+
+    qDebug(messageString.toStdString().c_str());
 }
 
 MainWindow::~MainWindow()
