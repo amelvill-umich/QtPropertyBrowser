@@ -43,11 +43,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     layout->addWidget(variantEditor);
 
-    // does not work,
-    // mainwindow.obj:-1: error: LNK2001: unresolved external symbol
-    // "public: static struct QMetaObject const QtVariantPropertyManager::staticMetaObject"
-    // (?staticMetaObject@QtVariantPropertyManager@@2UQMetaObject@@B)
-    //QObject::connect(variantManager, &QtVariantPropertyManager::valueChanged, this, &MainWindow::OnValueChanged_Print);
+    QObject::connect(variantManager, &QtVariantPropertyManager::valueChanged, this, &MainWindow::OnValueChanged_Print);
 
 
 }
