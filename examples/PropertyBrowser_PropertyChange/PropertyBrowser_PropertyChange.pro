@@ -17,7 +17,8 @@ message("PWD=$$PWD")
 
 INCLUDEPATH += ../../src
 
-
+# NOTE: This project file is built assuming that the build directory of the QtPropertyBrowser is <repo root>/build,
+#       no other build directory will work for this example
 win32:LIBS +=../../build/bin/Debug/QtPropertyBrowser.lib
 
 # I don't really understand why it's necessary to also link against these (what I'd think are) intermediate object files,

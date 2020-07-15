@@ -1,3 +1,5 @@
+message("Start of src/CMakeLists.txt")
+
 add_definitions(-DQT_QTPROPERTYBROWSER_EXPORT)
 
 SET(KIT_SRCS
@@ -39,21 +41,23 @@ INCLUDE_DIRECTORIES(
   )
   
 QT5_WRAP_UI(KIT_UI_CPP ${KIT_UI_FORMS})
-#QT5_WRAP_CPP(KIT_MOC_CPP ${KIT_MOC_SRCS})
+
 QT5_ADD_RESOURCES(KIT_QRC_SRCS ${KIT_resources})
 
-SET(libname ${PROJECT_NAME})
-ADD_LIBRARY(${libname} SHARED
+message("PROJECT_NAME is ${PROJECT_NAME}")
+message("QtPropertyBrowser_LINK_LIBRARIES is ${QtPropertyBrowser_LINK_LIBRARIES}")
+
+ADD_LIBRARY("QtPropertyBrowser" SHARED
   ${KIT_SRCS}
   ${KIT_UI_CPP}
-#  ${KIT_MOC_CPP}
   ${KIT_QRC_SRCS}
   )
-  
+
+#Seems to set it to... nothing?
 TARGET_LINK_LIBRARIES(
-  ${libname}
-  ${${PROJECT_NAME}_LINK_LIBRARIES}
+  "QtPropertyBrowser"
+  ${QtPropertyBrowser_LINK_LIBRARIES}
   )
 
-qt5_use_modules(${libname} Widgets Gui Core)
+qt5_use_modules("QtPropertyBrowser" Widgets Gui Core)
   

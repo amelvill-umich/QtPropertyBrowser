@@ -18,6 +18,9 @@
 #
 ###########################################################################
 
+# Note that this file does not seem to be affected by CONFIGURE_FILE in any way and is just copied
+# directly into the build directory, all the expressions are evaluated later.
+
 #
 # This module is provided as QtPropertyBrowser_USE_FILE by QtPropertyBrowserConfig.cmake. 
 # It can be INCLUDED in a project to load the needed compiler and linker
